@@ -1,4 +1,4 @@
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import Layout from '../layouts/Layout'
 import CustomizeMacros from '../components/CustomizeMacros'
 import { MacrosContext } from '../context/MacrosContext'
@@ -10,7 +10,10 @@ const DEFAULT_PROTEINS = 2.2
 export default function Foods() {
   const [, setLocation] = useLocation()
   const { macros, setFats, setProteins } = useContext(MacrosContext)
-  console.log(macros)
+
+  useEffect(() => { 
+    if (!macros) setLocation('/')
+  }, [macros])
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
