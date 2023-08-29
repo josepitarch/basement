@@ -7,7 +7,8 @@ import {
   type Gender,
   type Goal,
   type QuestionnaireProps,
-} from '../types'
+} from '../types/types'
+import CustomizeMacros from '../components/CustomizeMacros'
 
 type Question = {
   id: number
@@ -15,7 +16,7 @@ type Question = {
   type: 'radio' | 'input'
   name: keyof QuestionnaireProps
   options?: Record<string, string>
-  answer?: string
+  answer?: number | string
 }
 
 const questions: Question[] = [
@@ -73,32 +74,35 @@ const questions: Question[] = [
   },
 ]
 
+const DEFAULT_FATS = 0.9
+const DEFAULT_PROTEINS = 2.2
+
 export default function Questionnaire() {
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const answers = useRef<QuestionnaireProps>({
-    goal: 'maintain',
-    gender: 'male',
-    age: 0,
-    height: 0,
-    weight: 0,
-    activity: 'sedentary',
-  })
+
   const { questionnaire, saveQuestionnaire } = useContext(MacrosContext)
   const [, setLocation] = useLocation()
-  
-  useEffect(() => {
-    if (questionnaire) {
-      setLocation('/foods')
-    }
-  }, [questionnaire])
 
   const question = questions[currentQuestion]
   const progress = (currentQuestion / questions.length) * 100
 
-  const handleNextQuestion = () => {
-    if (currentQuestion === questions.length - 1) {
-      saveQuestionnaire(answers.current)
+  useEffect(() => {
+    if (questionnaire) {
       setLocation('/foods')
+    }
+    if (currentQuestion > 1 && currentQuestion < 5) {
+      const input = document.querySelector('input') as HTMLInputElement
+      input.value = questions[currentQuestion].answer as string
+    }
+  }, [questionnaire, currentQuestion])
+
+  const handleNextQuestion = () => {
+    if (question.type === 'radio') {
+      const input = document.querySelector('input:checked') as HTMLInputElement
+      question.answer = input.value
+    } else if (question.type === 'input') {
+      const input = document.querySelector('input') as HTMLInputElement
+      question.answer = Number(input.value)
     }
 
     setCurrentQuestion(currentQuestion + 1)
@@ -111,21 +115,65 @@ export default function Questionnaire() {
     setCurrentQuestion(currentQuestion - 1)
   }
 
-  const setQuestion = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target
-    if (name === 'goal') {
-      answers.current.goal = value as Goal
-    } else if (name === 'sex') {
-      answers.current.gender = value as Gender
-    } else if (name === 'age') {
-      answers.current.age = Number(value)
-    } else if (name === 'height') {
-      answers.current.height = Number(value)
-    } else if (name === 'weight') {
-      answers.current.weight = Number(value)
-    } else if (name === 'activity') {
-      answers.current.activity = value as Activity
-    }
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+
+    const formData = new FormData(event.currentTarget)
+    const fats = Number(formData.get('fats'))
+    const proteins = Number(formData.get('proteins'))
+
+    saveQuestionnaire({
+      goal: questions[0].answer as Goal,
+      gender: questions[1].answer as Gender,
+      age: questions[2].answer as number,
+      height: questions[3].answer as number,
+      weight: questions[4].answer as number,
+      activity: questions[5].answer as Activity,
+      fats,
+      proteins,
+    })
+
+    setLocation('/foods')
+  }
+
+
+  if (currentQuestion === questions.length - 1) {
+    return (
+      <Layout>
+        <form
+          className='relative w-full max-w-2xl max-h-full'
+          onSubmit={handleSubmit}
+        >
+          <div className='relative bg-white rounded-lg shadow dark:bg-gray-700'>
+            <div className='flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600'>
+              <h3 className='text-xl font-semibold text-gray-900 dark:text-white'>
+                Solo un pasito más...
+              </h3>
+            </div>
+            <div className='p-6 space-y-6'>
+              <CustomizeMacros
+                name='fats'
+                macro='grasas'
+                defaultValue={DEFAULT_FATS}
+              />
+              <CustomizeMacros
+                name='proteins'
+                macro='proteínas'
+                defaultValue={DEFAULT_PROTEINS}
+              />
+            </div>
+
+            <div className='flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600'>
+              <input
+                type='submit'
+                value='Calcular'
+                className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+              />
+            </div>
+          </div>
+        </form>
+      </Layout>
+    )
   }
 
   return (
@@ -150,7 +198,6 @@ export default function Questionnaire() {
                     name={question.name}
                     value={key}
                     defaultChecked={question.answer === key}
-                    onChange={setQuestion}
                   />
                   <label htmlFor={key} className='capitalize'>
                     {value}
@@ -164,7 +211,6 @@ export default function Questionnaire() {
               className='w-full p-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-700'
               name={question.name}
               defaultValue={question?.answer ?? 0}
-              onChange={setQuestion}
             />
           )}
 
