@@ -67,10 +67,10 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "foods_brand_fkey"
-            columns: ["brand"]
-            referencedRelation: "brands"
-            referencedColumns: ["id"]
+            foreignKeyName: 'foods_brand_fkey'
+            columns: ['brand']
+            referencedRelation: 'brands'
+            referencedColumns: ['id']
           }
         ]
       }
