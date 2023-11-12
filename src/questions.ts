@@ -7,9 +7,9 @@ const questions: Question[] = [
     type: TypeQuestion.RADIO,
     name: 'goal',
     options: {
-      lose: 'perder peso',
-      mantain: 'mantener peso',
-      gain: 'ganar peso'
+      LOSE_WEIGHT: 'Perder peso',
+      MAINTAIN_WEIGHT: 'Mantener peso',
+      GAIN_WEIGHT: 'Ganar peso'
     }
   },
   {
@@ -18,8 +18,8 @@ const questions: Question[] = [
     type: TypeQuestion.RADIO,
     name: 'gender',
     options: {
-      male: 'hombre',
-      female: 'mujer'
+      MALE: 'Hombre',
+      FEMALE: 'Mujer'
     }
   },
   {
@@ -46,11 +46,11 @@ const questions: Question[] = [
     type: TypeQuestion.RADIO,
     name: 'activity',
     options: {
-      sedentary: 'sedentario',
-      light: 'ligero',
-      moderate: 'moderado',
-      intense: 'intenso',
-      veryIntense: 'muy intenso'
+      SEDENTARY: 'Sedentario',
+      LIGHT: 'Ligero',
+      MODERATE: 'Moderado',
+      INTENSE: 'Intenso',
+      VERY_INTENSE: 'Muy intenso'
     }
   }
 ]
