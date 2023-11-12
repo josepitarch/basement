@@ -1,20 +1,30 @@
 import { type Database } from './supabase.js'
 
-export type Goal = 'lose' | 'maintain' | 'gain'
-export type Gender = 'male' | 'female'
-export type Activity =
-  | 'sedentary'
-  | 'light'
-  | 'moderate'
-  | 'intense'
-  | 'veryIntense'
+export enum Goal {
+  LOSE_WEIGHT,
+  MAINTAIN_WEIGHT,
+  GAIN_WEIGHT
+}
+
+export enum Gender {
+  MALE,
+  FEMALE
+}
+
+export enum Activity {
+  SEDENTARY = 1.2,
+  LIGHT = 1.375,
+  MODERATE = 1.55,
+  INTENSE = 1.725,
+  VERY_INTENSE = 1.9
+}
 
 export interface Question {
   id: number
   title: string
   type: TypeQuestion
   name: keyof Questionnaire
-  options?: Record<string, string>
+  options?: Record<keyof typeof Goal, string> | Record<keyof typeof Gender, string> | Record<keyof typeof Activity, string>
   answer?: number | string
 }
 
@@ -33,9 +43,9 @@ export interface Questionnaire {
 }
 
 export interface Macros {
-  kilocalories: number
+  kcal: number
   fats: number
-  carbohydrates: number
+  carbs: number
   proteins: number
 }
 
