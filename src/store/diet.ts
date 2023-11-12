@@ -6,174 +6,203 @@ interface State {
   addMeal: (name: string) => void
   removeMeal: (id: UUID) => void
   addOption: ({ mealId, name }: { mealId: UUID, name: string }) => void
-  removeOption: ({ mealId, name }: { mealId: UUID, name: string }) => void
+  removeOption: (id: UUID) => void
   addFood: ({ optionId, food }: { optionId: UUID, food: Food }) => void
   removeFood: ({ optionId, foodId }: { optionId: UUID, foodId: number }) => void
   addQuantity: ({ optionId, foodId, quantity }: { optionId: UUID, foodId: number, quantity: number }) => void
   removeQuantity: ({ optionId, foodId, quantity }: { optionId: UUID, foodId: number, quantity: number }) => void
 }
 
-export const useDietStore = create<State>((set) => ({
-  diet: {
-    meals: []
-  },
-  addMeal: (name) => {
-    set((state) => {
-      const meal = {
-        id: window.crypto.randomUUID(),
-        name,
-        options: []
-      }
+const saveDietInLocalStorage = (diet: Diet) => {
+  localStorage.setItem('diet', JSON.stringify(diet))
+}
 
-      const diet = { ...state.diet, meals: [...state.diet.meals, meal] }
+const getDietFromLocalStorage = () => {
+  const diet = localStorage.getItem('diet')
 
-      return { diet }
-    })
-  },
-  removeMeal: (id) => {
-    set((state) => {
-      const meals = state.diet.meals.filter((meal) => meal.id !== id)
+  if (!diet) return
 
-      const diet = { ...state.diet, meals }
+  return JSON.parse(diet)
+}
 
-      return { diet }
-    })
-  },
-  addOption: ({ mealId, name }) => {
-    set((state) => {
-      const option = {
-        id: window.crypto.randomUUID(),
-        name,
-        foods: []
-      }
+export const useDietStore = create<State>((set) => {
+  const diet = getDietFromLocalStorage()
+  const meals = diet?.meals || []
 
-      const meals = state.diet.meals.map((meal) => {
-        if (meal.id === mealId) {
-          return { ...meal, options: [...meal.options, option] }
+  return ({
+    diet: {
+      meals
+    },
+    addMeal: (name) => {
+      set((state) => {
+        const meal = {
+          id: window.crypto.randomUUID(),
+          name,
+          options: []
         }
 
-        return meal
+        const diet = { ...state.diet, meals: [...state.diet.meals, meal] }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
+    },
+    removeMeal: (id) => {
+      set((state) => {
+        const meals = state.diet.meals.filter((meal) => meal.id !== id)
 
-      const diet = { ...state.diet, meals }
+        const diet = { ...state.diet, meals }
 
-      return { diet }
-    })
-  },
-  removeOption: ({ mealId, name }) => {
-    set((state) => {
-      const meals = state.diet.meals.map((meal) => {
-        if (meal.id === mealId) {
-          const options = meal.options.filter((option) => option.name !== name)
+        saveDietInLocalStorage(diet)
+
+        return { diet }
+      })
+    },
+    addOption: ({ mealId, name }) => {
+      set((state) => {
+        const option = {
+          id: window.crypto.randomUUID(),
+          name,
+          foods: []
+        }
+
+        const meals = state.diet.meals.map((meal) => {
+          if (meal.id === mealId) {
+            return { ...meal, options: [...meal.options, option] }
+          }
+
+          return meal
+        })
+
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
+      })
+    },
+    removeOption: (id) => {
+      set((state) => {
+        const meals = state.diet.meals.map((meal) => {
+          const options = meal.options.filter((option) => option.id !== id)
 
           return { ...meal, options }
-        }
+        })
 
-        return meal
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
+    },
+    addFood: ({ optionId, food }) => {
+      set((state) => {
+        const meals = state.diet.meals.map((meal) => {
+          const options = meal.options.map((option) => {
+            if (option.id === optionId) {
+              const optionFood = {
+                food,
+                quantity: food.quantity
+              }
 
-      const diet = { ...state.diet, meals }
-
-      return { diet }
-    })
-  },
-  addFood: ({ optionId, food }) => {
-    set((state) => {
-      const meals = state.diet.meals.map((meal) => {
-        const options = meal.options.map((option) => {
-          if (option.id === optionId) {
-            const optionFood = {
-              food,
-              quantity: food.quantity
+              return { ...option, foods: [...option.foods, optionFood] }
             }
 
-            return { ...option, foods: [...option.foods, optionFood] }
-          }
+            return option
+          })
 
-          return option
+          return { ...meal, options }
         })
 
-        return { ...meal, options }
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
+    },
+    removeFood: ({ optionId, foodId }) => {
+      set((state) => {
+        const meals = state.diet.meals.map((meal) => {
+          const options = meal.options.map((option) => {
+            if (option.id === optionId) {
+              const foods = option.foods.filter((optionFood) => optionFood.food.id !== foodId)
 
-      const diet = { ...state.diet, meals }
+              return { ...option, foods }
+            }
 
-      return { diet }
-    })
-  },
-  removeFood: ({ optionId, foodId }) => {
-    set((state) => {
-      const meals = state.diet.meals.map((meal) => {
-        const options = meal.options.map((option) => {
-          if (option.id === optionId) {
-            const foods = option.foods.filter((optionFood) => optionFood.food.id !== foodId)
+            return option
+          })
 
-            return { ...option, foods }
-          }
-
-          return option
+          return { ...meal, options }
         })
 
-        return { ...meal, options }
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
+    },
+    addQuantity: ({ optionId, foodId, quantity }) => {
+      set((state) => {
+        const meals = state.diet.meals.map((meal) => {
+          const options = meal.options.map((option) => {
+            if (option.id === optionId) {
+              const foods = option.foods.map((optionFood) => {
+                if (optionFood.food.id === foodId) {
+                  return { ...optionFood, quantity: optionFood.quantity + quantity }
+                }
 
-      const diet = { ...state.diet, meals }
+                return optionFood
+              })
 
-      return { diet }
-    })
-  },
-  addQuantity: ({ optionId, foodId, quantity }) => {
-    set((state) => {
-      const meals = state.diet.meals.map((meal) => {
-        const options = meal.options.map((option) => {
-          if (option.id === optionId) {
-            const foods = option.foods.map((optionFood) => {
-              if (optionFood.food.id === foodId) {
-                return { ...optionFood, quantity: optionFood.quantity + quantity }
-              }
+              return { ...option, foods }
+            }
 
-              return optionFood
-            })
+            return option
+          })
 
-            return { ...option, foods }
-          }
-
-          return option
+          return { ...meal, options }
         })
 
-        return { ...meal, options }
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
+    },
+    removeQuantity: ({ optionId, foodId, quantity }) => {
+      set((state) => {
+        const meals = state.diet.meals.map((meal) => {
+          const options = meal.options.map((option) => {
+            if (option.id === optionId) {
+              const foods = option.foods.map((optionFood) => {
+                if (optionFood.food.id === foodId) {
+                  return { ...optionFood, quantity: optionFood.quantity - quantity }
+                }
 
-      const diet = { ...state.diet, meals }
+                return optionFood
+              })
 
-      return { diet }
-    })
-  },
-  removeQuantity: ({ optionId, foodId, quantity }) => {
-    set((state) => {
-      const meals = state.diet.meals.map((meal) => {
-        const options = meal.options.map((option) => {
-          if (option.id === optionId) {
-            const foods = option.foods.map((optionFood) => {
-              if (optionFood.food.id === foodId) {
-                return { ...optionFood, quantity: optionFood.quantity - quantity }
-              }
+              return { ...option, foods }
+            }
 
-              return optionFood
-            })
+            return option
+          })
 
-            return { ...option, foods }
-          }
-
-          return option
+          return { ...meal, options }
         })
 
-        return { ...meal, options }
+        const diet = { ...state.diet, meals }
+
+        saveDietInLocalStorage(diet)
+
+        return { diet }
       })
-
-      const diet = { ...state.diet, meals }
-
-      return { diet }
-    })
-  }
-}))
+    }
+  })
+})
