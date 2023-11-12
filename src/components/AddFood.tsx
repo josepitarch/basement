@@ -22,7 +22,10 @@ export default function AddFood ({ optionId }: { optionId: UUID }) {
       <Modal
         dismissible
         show={openModal === 'dismissible'}
-        onClose={() => { setOpenModal(undefined) }}
+        onClose={() => {
+          setSelectedRow(-1)
+          setOpenModal(undefined)
+        }}
       >
         <Modal.Header>Alimentos</Modal.Header>
         <Modal.Body>
@@ -49,7 +52,7 @@ export default function AddFood ({ optionId }: { optionId: UUID }) {
                     </Table.Cell>
                     <Table.Cell>{food.quantity}</Table.Cell>
                     <Table.Cell>{food.unit}</Table.Cell>
-                    <Table.Cell>{food.kilocalories}</Table.Cell>
+                    <Table.Cell>{food.kcal}</Table.Cell>
                     <Table.Cell>{food.fats}</Table.Cell>
                     <Table.Cell>{food.carbs}</Table.Cell>
                     <Table.Cell>{food.proteins}</Table.Cell>

@@ -1,3 +1,11 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
 export interface Database {
   public: {
     Tables: {
@@ -37,7 +45,7 @@ export interface Database {
           carbs: number
           fats: number
           id: number
-          kilocalories: number
+          kcal: number
           name: string
           proteins: number
           quantity: number
@@ -48,7 +56,7 @@ export interface Database {
           carbs?: number
           fats?: number
           id?: number
-          kilocalories: number
+          kcal: number
           name: string
           proteins?: number
           quantity?: number
@@ -59,7 +67,7 @@ export interface Database {
           carbs?: number
           fats?: number
           id?: number
-          kilocalories?: number
+          kcal?: number
           name?: string
           proteins?: number
           quantity?: number
@@ -67,10 +75,11 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'foods_brand_fkey'
-            columns: ['brand']
-            referencedRelation: 'brands'
-            referencedColumns: ['id']
+            foreignKeyName: "foods_brand_fkey"
+            columns: ["brand"]
+            isOneToOne: false
+            referencedRelation: "brands"
+            referencedColumns: ["id"]
           }
         ]
       }
