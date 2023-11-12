@@ -1,31 +1,31 @@
 import { create } from 'zustand'
 
 interface State {
-  macros: {
-    fats: number
-    proteins: number
+  macrosPerGram: {
+    fatsPerGram: number
+    proteinsPerGram: number
   }
-  setMacros: ({ fats, proteins }: { fats: number, proteins: number }) => void
+  setMacrosPerGram: ({ fatsPerGram, proteinsPerGram }: { fatsPerGram: number, proteinsPerGram: number }) => void
 }
 
-const KEY_LOCAL_STORAGE = 'macros'
+const KEY_LOCAL_STORAGE = 'macrosPerGram'
 
-const getMacrosFromLocalStore = () => {
-  const macros = localStorage.getItem(KEY_LOCAL_STORAGE)
+const getMacrosPerGramFromLocalStore = () => {
+  const macrosPerGram = localStorage.getItem(KEY_LOCAL_STORAGE)
 
-  if (!macros) return null
+  if (!macrosPerGram) return null
 
-  return JSON.parse(macros)
+  return JSON.parse(macrosPerGram)
 }
 
-const saveMacrosInLocalStorage = ({ fats, proteins }: { fats: number, proteins: number }) => {
-  localStorage.setItem(KEY_LOCAL_STORAGE, JSON.stringify({ fats, proteins }))
+const saveMacrosInLocalStorage = ({ fatsPerGram, proteinsPerGram }: { fatsPerGram: number, proteinsPerGram: number }) => {
+  localStorage.setItem(KEY_LOCAL_STORAGE, JSON.stringify({ fatsPerGram, proteinsPerGram }))
 }
 
 export const useCustomizeMacrosStore = create<State>((set) => ({
-  macros: getMacrosFromLocalStore(),
-  setMacros: ({ fats, proteins }) => {
-    set({ macros: { fats, proteins } })
-    saveMacrosInLocalStorage({ fats, proteins })
+  macrosPerGram: getMacrosPerGramFromLocalStore(),
+  setMacrosPerGram: ({ fatsPerGram, proteinsPerGram }) => {
+    set({ macrosPerGram: { fatsPerGram, proteinsPerGram } })
+    saveMacrosInLocalStorage({ fatsPerGram, proteinsPerGram })
   }
 }))
