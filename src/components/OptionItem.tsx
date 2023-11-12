@@ -1,10 +1,11 @@
+import { Button } from 'flowbite-react'
 import { useDietStore } from '../store/diet'
 import { type Option } from '../types/types'
 import AddFood from './AddFood'
 import { Icons } from './Icons'
 
 export default function OptionItem ({ option }: { option: Option }) {
-  const { removeFood, addQuantity, removeQuantity } = useDietStore()
+  const { removeOption, removeFood, addQuantity, removeQuantity } = useDietStore()
 
   const handleMealClick = () => {
     const container = document.getElementById(option.id)
@@ -17,17 +18,36 @@ export default function OptionItem ({ option }: { option: Option }) {
   }
 
   const macros = option.foods.reduce((acc, food) => {
-    acc.kilocalories += (food.quantity * food.food.kilocalories) / food.food.quantity
+    acc.kcal += (food.quantity * food.food.kcal) / food.food.quantity
     acc.fats += (food.quantity * food.food.fats) / food.food.quantity
     acc.carbs += (food.quantity * food.food.carbs) / food.food.quantity
     acc.proteins += (food.quantity * food.food.proteins) / food.food.quantity
     return acc
   }, {
-    kilocalories: 0,
+    kcal: 0,
     fats: 0,
     carbs: 0,
     proteins: 0
   })
+
+  const headerMacros = [
+    {
+      name: 'Kilocalorías',
+      value: macros.kcal
+    },
+    {
+      name: 'Grasas',
+      value: macros.fats
+    },
+    {
+      name: 'Carbohidratos',
+      value: macros.carbs
+    },
+    {
+      name: 'Proteínas',
+      value: macros.proteins
+    }
+  ]
 
   const capitalizeFoodName = (name: string) => {
     return name.charAt(0).toUpperCase() + name.slice(1)
@@ -61,41 +81,38 @@ export default function OptionItem ({ option }: { option: Option }) {
         </svg>
       </button>
       <div className='hidden'>
-        <div className={`flex flex-row gap-2 ${option.foods.length > 0 ? 'visible' : 'invisible'}`}>
-          <article className='flex flex-col'>
-            <span>Kilocalorías </span>
-            <span>
-              {macros.kilocalories.toFixed(0)}
-            </span>
-          </article>
-          <article className='flex flex-col'>
-            <span>Grasas </span>
-            <span>{macros.fats.toFixed(0)}</span>
-          </article>
-          <article className='flex flex-col'>
-            <span>Carbohidratos </span>
-            <span>{macros.carbs.toFixed(0)}</span>
-          </article>
-          <article className='flex flex-col'>
-            <span>Proteínas </span>
-            <span>{macros.proteins.toFixed(0)}</span>
-          </article>
+        <div className={`flex flex-row gap-2 justify-end ${option.foods.length > 0 ? 'visible' : 'invisible'}`}>
+          {
+            headerMacros.map((macro, index) => (
+              <article key={index} className='flex flex-col'>
+                <span>{macro.name}</span>
+                <span>
+                  {macro.value.toFixed(0)}
+                </span>
+              </article>
+            ))
+          }
         </div>
         <ul className='my-10'>
           {option.foods?.map((food, index) => (
-            <li key={index} className='flex flex-row'>
+            <li key={index} className='flex flex-row items-center justify-around'>
               <span>{capitalizeFoodName(food.food.name)}</span>
-              <button className='w-8' onClick={() => { removeQuantity({ optionId: option.id, foodId: food.food.id, quantity: 1 }) }}><Icons.minus /></button>
-              <span>{food.quantity} {food.food.unit}</span>
-              <button className='w-6' onClick={() => { addQuantity({ optionId: option.id, foodId: food.food.id, quantity: 1 }) }}><Icons.add /></button>
+              <div className=''>
+                <button className='w-8' onClick={() => { removeQuantity({ optionId: option.id, foodId: food.food.id, quantity: 1 }) }}><Icons.minus /></button>
+                <span>{food.quantity} {food.food.unit}</span>
+                <button className='w-6' onClick={() => { addQuantity({ optionId: option.id, foodId: food.food.id, quantity: 1 }) }}><Icons.add /></button>
+              </div>
               <button className='flex flex-row gap-2 items-center' onClick={() => { removeFood({ optionId: option.id, foodId: food.food.id }) }}>
-                <span>Eliminar</span>
+                <p>Eliminar</p>
                 <Icons.trash />
               </button>
             </li>
           ))}
         </ul>
-        <AddFood optionId={option.id} />
+        <footer className='flex flex-row justify-between'>
+          <AddFood optionId={option.id} />
+          <Button onClick={() => { removeOption(option.id) }}>Eliminar</Button>
+        </footer>
       </div>
     </div>
   )
