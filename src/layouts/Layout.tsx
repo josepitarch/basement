@@ -6,8 +6,8 @@ export default function Layout ({ title = 'The Basement', children }: { title?: 
   }, [title])
 
   return (
-    <div className='max-w-[1200px] m-auto lg:-translate-x-28'>
-      <main className='flex justify-center p-6 animate-fade-up text-black'>
+    <div className='max-w-[1200px] m-auto'>
+      <main className='flex justify-center p-6 animate-fade-up text-white'>
         {children}
       </main>
     </div>

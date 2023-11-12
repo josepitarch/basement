@@ -10,7 +10,7 @@ const DEFAULT_PROTEINS = 2.2
 export default function CustomizeMacros () {
   const [, setLocation] = useLocation()
   const { questionnaire } = useQuestionnaireStore()
-  const { macros, setMacros } = useCustomizeMacrosStore()
+  const { macrosPerGram: macros, setMacrosPerGram: setMacros } = useCustomizeMacrosStore()
 
   useEffect(() => {
     if (!questionnaire) {
@@ -27,7 +27,7 @@ export default function CustomizeMacros () {
     const formData = new FormData(event.currentTarget)
     const fats = Number(formData.get('fats'))
     const proteins = Number(formData.get('proteins'))
-    setMacros({ fats, proteins })
+    setMacros({ fatsPerGram: fats, proteinsPerGram: proteins })
 
     setLocation('/foods')
   }
@@ -73,7 +73,7 @@ export default function CustomizeMacros () {
             <input
               type='submit'
               value='Calcular'
-              className='text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800'
+              className='text-white bg-blue-700focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:focus:ring-blue-800'
             />
           </div>
         </div>

@@ -55,12 +55,3 @@ body {
   transition: box-shadow 0.5s ease-out;
   z-index: -1;
 }
-
-#start-questionnaire:hover {
-  color: #fff;
-  border: 1px solid rgb(255,0,0);
-}
-
-#start-questionnaire:hover::before {
-  box-shadow: inset 0 0 0 10em rgb(255, 0, 0);
-}
