@@ -25,6 +25,13 @@ export default function Questionnaire () {
   }, [questionnaire, currentQuestion])
 
   const handleNextQuestion = () => {
+    if (question.type === TypeQuestion.RADIO) {
+      const input = document.querySelector('input:checked') as HTMLInputElement
+      question.answer = input.value
+    } else if (question.type === TypeQuestion.INPUT) {
+      const input = document.querySelector('input') as HTMLInputElement
+      question.answer = Number(input.value)
+    }
     if (currentQuestion === questions.length - 1) {
       setQuestionnaire({
         goal: questions[0].answer as Goal,
@@ -35,14 +42,7 @@ export default function Questionnaire () {
         activity: questions[5].answer as Activity
       })
 
-      setLocation('/foods')
-    }
-    if (question.type === TypeQuestion.RADIO) {
-      const input = document.querySelector('input:checked') as HTMLInputElement
-      question.answer = input.value
-    } else if (question.type === TypeQuestion.INPUT) {
-      const input = document.querySelector('input') as HTMLInputElement
-      question.answer = Number(input.value)
+      setLocation('/customize-fats-and-proteins')
     }
 
     setCurrentQuestion(currentQuestion + 1)
